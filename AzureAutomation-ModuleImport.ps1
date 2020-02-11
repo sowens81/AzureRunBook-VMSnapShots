@@ -11,16 +11,16 @@
 
         Usage:
 
-        To run the script excute AzureAutomationAzImport.ps1 "AutomationAccountName" "ResourceGroupName"
+        To run the script excute AzureAutomationAzImport.ps1 "automationAccountName" "resourceGroupName"
 
     
 
-    .PARAMETER AutomationAccountName
+    .PARAMETER automationAccountName
 
         [Mandatory Parameter] Name of the Azure Automation Account to deploy the module to.
 
 
-    .PARAMETER ResourceGroupName
+    .PARAMETER resourceGroupName
 
         [Mandatory Parameter] Name of the Resource Group where the Azure Automation Account is located.
 
@@ -35,10 +35,9 @@
 
 #>
 
-param(
-    [string][Parameter(Mandatory = $true)] $AutomationAccountName,
-    [string][Parameter(Mandatory = $true)] $ResourceGroupName
- )
+$automationAccountName,
+$resourceGroupName
+
 
  $ErrorActionPreference = 'Stop'
 
@@ -57,6 +56,6 @@ $moduleUri = "https://www.powershellgallery.com/api/v2/package/"
 
 foreach($module in $modules)
 {
-  New-AzAutomationModule -Name $module -ContentLinkUri $ModuleUri+$module -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName
+  New-AzAutomationModule -Name $module -ContentLinkUri $moduleUri+$module -ResourceGroupName $resourceGroupName -AutomationAccountName $automationAccountName
 }
 

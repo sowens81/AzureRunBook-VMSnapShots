@@ -12,19 +12,27 @@
         An Azure Automation Account with a Run As Account enabled.
         All Disk resources that required snapshots in resource group must Included the following Tag:
         Key=SnapShot Value=True
+        An Azure Automation Runbook parameter - subscriptionName
+        An Azure Automation Runbook parameter - resourceGroupName
+        An Azure Automation Runbook parameter - resourceGroupName
+        An Azure Automation Runbook parameter - resourceGroupName
+        An Azure Automation Runbook parameter - resourceGroupName
         
         Usage:
 
-        To run the script excute AzRunBook-VMSnapShot.ps1 "subscriptionName" "resourceGroupName"
-
-        
+        n/a - part of an Azure Runbook
+    
     .PARAMETER subscriptionName
 
-        [Mandatory Parameter] Name of the Azure Subscription where the resources reside.
-
+        [Mandatory Parameter] Name of the Azure Automation Account to deploy the module to.
+    
     .PARAMETER resourceGroupName
 
-        [Mandatory Parameter] Name of the Azure Resource Group where the resources reside.
+        [Mandatory Parameter] Name of the Azure Automation Account to deploy the module to.
+    
+    .PARAMETER subscriptionName
+
+        [Mandatory Parameter] Name of the Azure Automation Account to deploy the module to.
 
 
     .NOTES
@@ -36,11 +44,6 @@
         VERSION: 1.0.0.1
 
 #>
-
-param(
-    [string][Parameter(Mandatory = $true)]$subscriptionName,
-    [string][Parameter(Mandatory = $true)]$ResourceGroupName
-)
 
 $ErrorActionPreference = 'Stop'
 
@@ -64,9 +67,12 @@ while(!($connectionResult) -And ($logonAttempt -le 10))
     Start-Sleep -Seconds 30
 }
 
+$resourceSubscriptionName = (Get-AzAutomationVariable -Name  subscriptionName -ResourceGroupName $ -AutomationAccountName $).Value
+$resourceGroupName = (Get-AzAutomationVariable -Name  subscriptionName -ResourceGroupName $ -AutomationAccountName $).Value
 
-$AzureContext = Select-AzSubscription -Subscription $subscriptionName
-$Disks=Get-AzDisk -AzContext $AzureContext | Select Name,Tags,Id,Location,ResourceGroupName | Where-Object {$_.ResourceGroupName -eq $ResourceGroupName}
+
+$AzureContext = Select-AzSubscription -Subscription $resourceSubscriptionName
+$Disks=Get-AzDisk -AzContext $AzureContext | Select Name,Tags,Id,Location,ResourceGroupName | Where-Object {$_.ResourceGroupName -eq $resourceGroupName}
 
 foreach($disk in $Disks) 
 { 
