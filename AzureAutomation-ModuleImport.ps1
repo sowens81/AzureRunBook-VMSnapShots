@@ -51,7 +51,7 @@ param(
     }
   }
 
-$modules = "Az.Profile", "Az.Accounts","Az.Resources", "Az.Compute"
+$modules = "Az.Profile", "Az.Automation", "Az.Accounts","Az.Resources", "Az.Compute"
 $moduleUri = "https://www.powershellgallery.com/api/v2/package/"
 
 
