@@ -34,9 +34,10 @@
         VERSION: 1.0.0.1
 
 #>
-
-$automationAccountName,
-$resourceGroupName
+param(
+      [string][Parameter(Mandatory = $true)] $automationAccountName,
+      [string][Parameter(Mandatory = $true)] $resourceGroupName
+)
 
 
  $ErrorActionPreference = 'Stop'
