@@ -13,7 +13,7 @@
         
         Usage:
 
-        To run the script excute AzRunBook-VMSS.ps1 "automationAccountSubscriptionName" "automationAccountResourceGroupName" "automationAccountName" "resourceSubscriptionName" "resourceGroupName"
+        To run the script excute AzRunBook-VMSS.ps1 "automationAccountSubscriptionName" "automationAccountResourceGroupName" "automationAccountName" "resourceSubscriptionName" "resourceGroupName" "runbookName" "startTime" "hourInterval"
 
     
 
@@ -93,17 +93,17 @@ New-AzAutomationVariable -Name subscriptionName -Value $resourceSubscriptionName
 New-AzAutomationVariable -Name resourceGroupName -Value $resourceGroupName -ResourceGroupName $automationAccountResourceGroupName -AutomationAccountName $automationAccountName -Encrypted 0
 
 # Creates a new Azure Automation Runbook
-New-AzAutomationRunbook -Name "Virtual-Machine-Snapshot - $resourceGroupName" -Type PowerShell -ResourceGroupName $automationAccountResourceGroupName -AutomationAccountName $automationAccountName
+New-AzAutomationRunbook -Name "$runbookName - $resourceGroupName" -Type PowerShell -ResourceGroupName $automationAccountResourceGroupName -AutomationAccountName $automationAccountName
 
 # Imports a PowerShell Script to an Automation Runbook
-Import-AzAutomationRunbook -Type PowerShell -Path "runbook/VMSnapShot.ps1"  -Name "Virtual-Machine-Snapshot" -Description "Automation Run Book to create VM Disk SnapShots" -ResourceGroupName $automationAccountResourceGroupName -AutomationAccountName $automationAccountName -Force
+Import-AzAutomationRunbook -Type PowerShell -Path "runbook/VMSnapShot.ps1"  -Name "$runbookName" -Description "Automation Run Book to create VM Disk SnapShots" -ResourceGroupName $automationAccountResourceGroupName -AutomationAccountName $automationAccountName -Force
 
 # Publishes the Automation runbook
-Publish-AzAutomationRunbook -Name "Virtual-Machine-Snapshot - $resourceGroupName" -ResourceGroupName $automationAccountResourceGroupName -AutomationAccountName $automationAccountName
+Publish-AzAutomationRunbook -Name "$runbookName - $resourceGroupName" -ResourceGroupName $automationAccountResourceGroupName -AutomationAccountName $automationAccountName
 
 # Creates a re-usable Automation Runbook Schedule
-New-AzureRMAutomationSchedule –Name "Daily Disk Snapshots - $resourceGroupName" -StartTime $startTime -HourInterval $hourInterval  -ResourceGroupName $automationAccountResourceGroupName -AutomationAccountName $automationAccountName
+New-AzureRMAutomationSchedule –Name "Schedule - Every $hourInterval House" -StartTime $startTime -HourInterval $hourInterval  -ResourceGroupName $automationAccountResourceGroupName -AutomationAccountName $automationAccountName
 
 # Register an Automation Runbook Schedule with an Automation Runbook
-Register-AzAutomationScheduledRunbook -Name "Virtual-Machine-Snapshot - $resourceGroupName" -AutomationAccountName $automationAccountName -ResourceGroupName $automationAccountResourceGroupName -ScheduleName "Daily Disk Snapshots - $resourceGroupName"
+Register-AzAutomationScheduledRunbook -Name "$runbookName - $resourceGroupName" -AutomationAccountName $automationAccountName -ResourceGroupName $automationAccountResourceGroupName -ScheduleName "Schedule - Every $hourInterval House"
 
