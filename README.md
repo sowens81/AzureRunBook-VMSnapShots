@@ -29,3 +29,4 @@ Run the AzRunBook-VMSS.ps1 for as many different Snapshot runbooks as you need (
 ## Acknowledgments
 
 * **Matt Perry** - [dillorscroft](https://github.com/dillorscroft)
+* **Microsoft Automation Team** [Update-ModulesInAutomationToLatestVersion](https://github.com/azureautomation/runbooks/blob/master/Utility/Update-ModulesInAutomationToLatestVersion.ps1)
