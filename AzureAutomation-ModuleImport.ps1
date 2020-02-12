@@ -53,7 +53,7 @@ param(
     }
   }
 
-$modules = @{"Az.Profile" = "0.7.0"; "Az.Automation" = "1.3.5"; "Az.Accounts" = "1.7.1"; "Az.Resources" = "1.10.0"; "Az.Compute" = "3.3.0"}
+$modules = @{"Az.Profile" = "0.7.0"; "Az.Automation" = "1.3.5"; "Az.Accounts" = "1.7.1"; "Az.Resources" = "1.10.0"; "Az.Compute" = "3.4.0"}
 
 $ModulesImported = @()
 
@@ -125,7 +125,7 @@ function _doImport {
                         # check if we already imported this dependency module during execution of this script
                         if(!$ModulesImported.Contains($DependencyName)) {
 
-                            $AutomationModule = Get-AzureRmAutomationModule `
+                            $AutomationModule = Get-AzAutomationModule `
                                 -ResourceGroupName $ResourceGroupName `
                                 -AutomationAccountName $AutomationAccountName `
                                 -Name $DependencyName `
@@ -151,16 +151,17 @@ function _doImport {
             }
             
             # Find the actual blob storage location of the module
-            do {
-                $ActualUrl = $ModuleContentUrl
-                Write-Host "Error Happens here with Invoke-WebRequest"
-                $ModuleContentUrl = (Invoke-WebRequest -Uri $ModuleContentUrl -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore).Headers.Location 
-            } while($ModuleContentUrl -ne $Null)
-
+            #do {
+                #$ActualUrl = $ModuleContentUrl
+                #Write-Host "Error Happens here with Invoke-WebRequest"
+                #$ModuleContentUrl = (Invoke-WebRequest -Uri $ModuleContentUrl -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore).Headers.Location 
+            #} while($ModuleContentUrl -ne $Null)
+            
+            $ActualUrl = $ModuleContentUrl
 
             Write-Verbose -Message "Importing $ModuleName module of version $ModuleVersion from $ActualUrl to Automation"
 
-            $AutomationModule = New-AzureRmAutomationModule `
+            $AutomationModule = New-AzAutomationModule `
                 -ResourceGroupName $ResourceGroupName `
                 -AutomationAccountName $AutomationAccountName `
                 -Name $ModuleName `
@@ -174,7 +175,7 @@ function _doImport {
             {
                 Write-Verbose -Message "Polling for module import completion"
                 Start-Sleep -Seconds 10
-                $AutomationModule = $AutomationModule | Get-AzureRmAutomationModule
+                $AutomationModule = $AutomationModule | Get-AzAutomationModule
             }
 
             if($AutomationModule.ProvisioningState -eq "Failed") {
