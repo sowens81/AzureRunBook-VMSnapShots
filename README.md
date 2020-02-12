@@ -18,7 +18,14 @@ An Azure Automation Account - [Setup an Azure Automation Account](https://docs.m
 
 ### Usage
 
-Run the AzureAutomation-ModuleImport.ps1 script first to import the modules - see script documentation for more details
+This script is currently not working remotely, use manual aproach below. - Run the AzureAutomation-ModuleImport.ps1 script first to import the modules - see script documentation for more details
+
+Install the following Az Modules via the PowerShell Gallery Azure Automation Installer
+* [Az.Automation](https://www.powershellgallery.com/packages/Az.Automation/)
+* [Az.Profile](https://www.powershellgallery.com/packages/Az.Profile/)
+* [Az.Compute](https://www.powershellgallery.com/packages/Az.Compute/)
+* [Az.Resources](https://www.powershellgallery.com/packages/Az.Resources/)
+* [Az.Accounts](https://www.powershellgallery.com/packages/Az.Accounts/)
 
 Run the AzRunBook-VMSS.ps1 for as many different Snapshot runbooks as you need (provide different names for each runbook) - see script documentation for more details
 
