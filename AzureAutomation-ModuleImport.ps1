@@ -53,7 +53,7 @@ param(
     }
   }
 
-$modules = @{"Az.Profile" = "0.7.0"; "Az.Automation" = "1.3.5"; "Az.Accounts" = "1.7.1"; "Az.Resources" = "1.10.0"; "Az.Compute" = "3.4.0"}
+$modules = @{"az.profile" = "0.7.0"; "az.automation" = "1.3.5"; "az.accounts" = "1.7.1"; "az.resources" = "1.10.0"; "az.compute" = "3.4.0"}
 
 $ModulesImported = @()
 
@@ -73,17 +73,21 @@ function _doImport {
         [String] $ModuleVersion
     )
 
-    $Url = "https://www.powershellgallery.com/api/v2/Search()?`$filter=IsLatestVersion&searchTerm=%27$ModuleName%27&targetFramework=%27%27&includePrerelease=false&`$skip=0&`$top=40" 
-    $SearchResult = Invoke-RestMethod -Method Get -Uri $Url -UseBasicParsing
+    #$Url = "https://www.powershellgallery.com/api/v2/Search()?`$filter=IsLatestVersion&searchTerm=%27$ModuleName%27&targetFramework=%27%27&includePrerelease=false&`$skip=0&`$top=40" 
+    #$SearchResult = Invoke-RestMethod -Method Get -Uri $Url -UseBasicParsing
 
-    if($SearchResult.Length -and $SearchResult.Length -gt 1) {
-        $SearchResult = $SearchResult | Where-Object -FilterScript {
-            return $_.properties.title -eq $ModuleName
-        }
-    }
+    #if($SearchResult.Length -and $SearchResult.Length -gt 1) {
+    #    $SearchResult = $SearchResult | Where-Object -FilterScript {
+    #        return $_.properties.title -eq $ModuleName
+    #    }
+    #}
+    
+    # Remove variable below when script fixed.
+    $SearchResult = $null
 
     if(!$SearchResult) {
-        Write-Error "Could not find module '$ModuleName' on PowerShell Gallery."
+    #    Write-Error "Could not find module '$ModuleName' on PowerShell Gallery."
+        
     }
     else {
         $ModuleName = $SearchResult.properties.title # get correct casing for the module name
@@ -134,7 +138,7 @@ function _doImport {
                             # check if Automation account already contains this dependency module of the right version
                             if((!$AutomationModule) -or $AutomationModule.Version -ne $DependencyVersion) {
                                 
-                                Write-Verbose -Message "Importing dependency module $DependencyName of version $DependencyVersion first."
+                               Write-Host "Importing dependency module $DependencyName of version $DependencyVersion first."
 
                                 # this dependency module has not been imported, import it first
                                 _doImport `
@@ -159,7 +163,7 @@ function _doImport {
             
             $ActualUrl = $ModuleContentUrl
 
-            Write-Verbose -Message "Importing $ModuleName module of version $ModuleVersion from $ActualUrl to Automation"
+           Write-Host "Importing $ModuleName module of version $ModuleVersion from $ActualUrl to Automation"
 
             $AutomationModule = New-AzAutomationModule `
                 -ResourceGroupName $ResourceGroupName `
@@ -173,7 +177,7 @@ function _doImport {
                 $AutomationModule.ProvisioningState -ne "Failed"
             )
             {
-                Write-Verbose -Message "Polling for module import completion"
+               Write-Host "Polling for module import completion"
                 Start-Sleep -Seconds 10
                 $AutomationModule = $AutomationModule | Get-AzAutomationModule
             }
@@ -182,20 +186,51 @@ function _doImport {
                 Write-Error "Importing $ModuleName module to Automation failed."
             }
             else {
-                Write-Verbose "Importing $ModuleName module to Automation succeeded."
+                Write-Host "Importing $ModuleName module to Automation succeeded."
             }
         }
     }
+
+    # Temporay Fix:
+
+          $githubURI = "https://github.com/sowens81/AzureRunBook-VMSnapShots/blob/master/PowerShellModules/$ModuleName.$ModuleVersion.nupkg?raw=true"
+
+          $ActualUrl = $githubURI
+
+           Write-Host "Importing $ModuleName module of version $ModuleVersion from $ActualUrl to Automation"
+
+            $AutomationModule = New-AzAutomationModule `
+                -ResourceGroupName $ResourceGroupName `
+                -AutomationAccountName $AutomationAccountName `
+                -Name $ModuleName `
+                -ContentLink $ActualUrl
+
+            while(
+                $AutomationModule.ProvisioningState -ne "Created" -and
+                $AutomationModule.ProvisioningState -ne "Succeeded" -and
+                $AutomationModule.ProvisioningState -ne "Failed"
+            )
+            {
+                Write-Host "Polling for module import completion"
+                Start-Sleep -Seconds 10
+                $AutomationModule = $AutomationModule | Get-AzAutomationModule
+            }
+
+            if($AutomationModule.ProvisioningState -eq "Failed") {
+                Write-Error "Importing $ModuleName module to Automation failed."
+            }
+            else {
+                Write-Host "Importing $ModuleName module to Automation succeeded."
+            }
 }
 
-
-
 #Import Each Azure Az Module
-foreach ($h in $modules.GetEnumerator()) {
-  $modName = $($h.Name)
+foreach ($h in $modules.Keys) {
+  $modName = $h
+  $mVersion = $modules[$h]
   _doImport `
     -ResourceGroupName $ResourceGroupName `
     -AutomationAccountName $AutomationAccountName `
     -ModuleName $modName `
-    -ModuleVersion $ModuleVersion
+    -ModuleVersion $mVersion
 }
