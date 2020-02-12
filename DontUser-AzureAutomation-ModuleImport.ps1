@@ -72,7 +72,7 @@ function _doImport {
         [Parameter(Mandatory=$false)]
         [String] $ModuleVersion
     )
-
+          
     $Url = "https://www.powershellgallery.com/api/v2/Search()?`$filter=IsLatestVersion&searchTerm=%27$ModuleName%27&targetFramework=%27%27&includePrerelease=false&`$skip=0&`$top=40" 
     $SearchResult = Invoke-RestMethod -Method Get -Uri $Url -UseBasicParsing
 
