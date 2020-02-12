@@ -153,6 +153,7 @@ function _doImport {
             # Find the actual blob storage location of the module
             do {
                 $ActualUrl = $ModuleContentUrl
+                Write-Host "Error Happens here with Invoke-WebRequest"
                 $ModuleContentUrl = (Invoke-WebRequest -Uri $ModuleContentUrl -MaximumRedirection 0 -UseBasicParsing -ErrorAction Ignore).Headers.Location 
             } while($ModuleContentUrl -ne $Null)
 
